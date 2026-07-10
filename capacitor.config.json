@@ -1,0 +1,9 @@
+{
+  "appId": "com.rakshak.sos",
+  "appName": "Rakshak SOS",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true
+  }
+}

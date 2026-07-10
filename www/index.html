@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rakshak SOS</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0f1e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rakshak SOS">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+
+  :root {
+    --bg: #0a0f1e;
+    --surface: #111827;
+    --surface2: #1a2438;
+    --border: #1e3050;
+    --red: #e63946;
+    --red-glow: rgba(230,57,70,0.35);
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --text: #f1f5f9;
+    --muted: #64748b;
+    --accent: #f97316;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(180deg, #0f1c35 0%, var(--bg) 100%);
+    padding: 20px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-logo { display: flex; align-items: center; gap: 10px; }
+  .shield-icon { font-size: 28px; }
+  .header-title { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; }
+  .header-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .header-badge {
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(34,197,94,0.3);
+  }
+
+  /* NAV TABS */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 1;
+    min-width: 70px;
+    padding: 13px 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab.active { color: var(--red); border-bottom-color: var(--red); }
+  .tab-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+
+  /* PAGES */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* STATUS BAR */
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .status-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-icon { font-size: 20px; }
+  .status-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-val { font-size: 14px; font-weight: 600; margin-top: 1px; }
+  .status-val.green { color: var(--green); }
+  .status-val.red { color: var(--red); }
+
+  /* SOS BUTTON */
+  .sos-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 10px;
+  }
+  .sos-ring {
+    position: relative;
+    width: 210px;
+    height: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sos-ring::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 2px solid rgba(230,57,70,0.2);
+    animation: ring-pulse 2s ease-in-out infinite;
+  }
+  .sos-ring::after {
+    content: '';
+    position: absolute;
+    inset: -24px;
+    border-radius: 50%;
+    border: 1px solid rgba(230,57,70,0.1);
+    animation: ring-pulse 2s ease-in-out infinite 0.4s;
+  }
+  @keyframes ring-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.03); }
+  }
+  .sos-btn {
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    border: none;
+    background: radial-gradient(circle at 35% 35%, #ff5a67, #c1121f);
+    color: white;
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 0 40px var(--red-glow), 0 8px 32px rgba(0,0,0,0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative;
+    z-index: 1;
+  }
+  .sos-btn:active { transform: scale(0.96); box-shadow: 0 0 20px var(--red-glow); }
+  .sos-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+    text-align: center;
+  }
+
+  /* LOCATION BOX */
+  .location-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .location-box.active {
+    border-color: rgba(34,197,94,0.4);
+    background: rgba(34,197,94,0.07);
+    color: var(--text);
+  }
+  .location-box a { color: var(--green); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-header {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* CONTACTS */
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .contact-item:last-child { border-bottom: none; }
+  .contact-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .contact-name { font-size: 14px; font-weight: 600; }
+  .contact-phone { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .contact-actions { margin-left: auto; display: flex; gap: 8px; }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: background 0.15s;
+  }
+  .icon-btn:hover { background: var(--border); }
+  .icon-btn.danger { border-color: rgba(230,57,70,0.3); }
+  .icon-btn.danger:hover { background: rgba(230,57,70,0.15); }
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    padding: 20px 0;
+  }
+
+  /* INPUTS */
+  .input-group { margin-bottom: 12px; }
+  .input-label { font-size: 12px; color: var(--muted); margin-bottom: 5px; display: block; font-weight: 500; }
+  input[type=text], input[type=tel], select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--blue); }
+
+  /* BUTTONS */
+  .btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-success { background: var(--green); color: white; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* HISTORY */
+  .history-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--red);
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  .history-dot.cancelled { background: var(--muted); }
+  .history-title { font-size: 13px; font-weight: 600; }
+  .history-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .history-badge {
+    margin-left: auto;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    flex-shrink: 0;
+    height: fit-content;
+  }
+  .badge-sent { background: rgba(230,57,70,0.15); color: var(--red); }
+  .badge-cancelled { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  /* COUNTDOWN MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    backdrop-filter: blur(6px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    text-align: center;
+    padding: 20px;
+  }
+  .modal-title { font-size: 22px; font-weight: 700; }
+  .modal-sub { color: var(--muted); margin-top: 6px; font-size: 14px; }
+  .countdown-ring {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 30px auto;
+  }
+  .countdown-svg { transform: rotate(-90deg); }
+  .countdown-circle-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+  .countdown-circle {
+    fill: none;
+    stroke: var(--red);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 408;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+  }
+  .countdown-number {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    font-weight: 900;
+    color: var(--red);
+  }
+  .modal-contacts-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 0 auto 24px;
+    max-width: 300px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: left;
+  }
+  .modal-contacts-preview strong { color: var(--text); }
+
+  /* WHATSAPP SHARE */
+  .share-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 12px;
+  }
+  .share-card-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 8px;
+  }
+  .share-whatsapp { background: #25d366; color: white; }
+  .share-sms { background: var(--blue); color: white; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 50;
+  }
+  .nav-item {
+    flex: 1;
+    padding: 12px 4px 10px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-item.active { color: var(--red); }
+  .nav-icon { font-size: 20px; display: block; margin-bottom: 3px; }
+
+  /* MEDICAL FIELDS */
+  .medical-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .medical-tag {
+    display: inline-block;
+    background: rgba(59,130,246,0.15);
+    color: var(--blue);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin: 3px;
+    border: 1px solid rgba(59,130,246,0.3);
+  }
+
+  /* SETTINGS */
+  .settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-label { font-size: 14px; }
+  .settings-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    width: 44px;
+    height: 24px;
+    background: var(--border);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    border: none;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    transition: left 0.2s;
+  }
+  .toggle.on { background: var(--green); }
+  .toggle.on::after { left: 23px; }
+  .countdown-select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+
+  .section-divider {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin: 18px 0 10px;
+  }
+
+  /* FAKE CALL SCREEN */
+  .fakecall-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: linear-gradient(180deg,#1c2a44 0%,#0a0f1e 70%);
+    flex-direction: column;
+    align-items: center;
+    color: white;
+  }
+  .fakecall-overlay.show { display: flex; }
+  .fakecall-top { text-align:center; margin-top:14vh; }
+  .fakecall-label { font-size:13px; color:#93a3bb; letter-spacing:1px; text-transform:uppercase; }
+  .fakecall-name { font-size:30px; font-weight:800; margin-top:10px; }
+  .fakecall-sub { font-size:14px; color:#93a3bb; margin-top:6px; }
+  .fakecall-avatar {
+    width:110px; height:110px; border-radius:50%; margin-top:22px;
+    background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+    display:flex; align-items:center; justify-content:center;
+    font-size:42px; font-weight:800;
+  }
+  .fakecall-actions {
+    margin-top:auto;
+    margin-bottom:8vh;
+    display:flex;
+    gap:60px;
+    align-items:center;
+  }
+  .fc-btn {
+    width:66px; height:66px; border-radius:50%; border:none;
+    font-size:26px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .fc-decline { background:var(--red); color:white; }
+  .fc-accept  { background:var(--green); color:white; }
+  .fc-btn-label { font-size:11px; color:#93a3bb; text-align:center; margin-top:8px; }
+  .fc-btn-wrap { display:flex; flex-direction:column; align-items:center; }
+  .fakecall-active-bar {
+    display:none;
+    margin-top:auto;
+    margin-bottom:8vh;
+  }
+  .fakecall-active-bar.show { display:block; }
+
+  /* SEND CHECKLIST */
+  .send-item {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .send-item:last-child { border-bottom:none; }
+  .send-item .contact-name { font-size:13px; }
+  .send-links { margin-left:auto; display:flex; gap:8px; }
+  .send-links a {
+    font-size:12px;
+    padding:7px 12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    color:white;
+  }
+  .send-wa  { background:#25d366; }
+  .send-sms { background:var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <span class="shield-icon">🛡</span>
+    <div>
+      <div class="header-title">Rakshak SOS</div>
+      <div class="header-sub">Emergency Safety Companion</div>
+    </div>
+  </div>
+  <span class="header-badge" id="networkBadge">● Online</span>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showPage('home',this)"><span class="tab-icon">🏠</span>Home</div>
+  <div class="tab" onclick="showPage('contacts',this)"><span class="tab-icon">👥</span>Contacts</div>
+  <div class="tab" onclick="showPage('history',this)"><span class="tab-icon">📜</span>History</div>
+  <div class="tab" onclick="showPage('medical',this)"><span class="tab-icon">🩺</span>Medical</div>
+  <div class="tab" onclick="showPage('settings',this)"><span class="tab-icon">⚙</span>Settings</div>
+</div>
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="page-home">
+
+  <!-- STATUS GRID -->
+  <div class="status-grid">
+    <div class="status-item">
+      <span class="status-icon">📍</span>
+      <div>
+        <div class="status-label">GPS</div>
+        <div class="status-val green" id="gpsStatus">Ready</div>
+      </div>
+    </div>
+    <div class="status-item">
+      <span class="status-icon">🔋</span>
+      <div>
+        <div class="status-label">Battery</div>
+        <div class="status-val" id="batteryVal">—</div>
+      </div>
+    </div>
+    <div class="status-item">
+      <span class="status-icon">📶</span>
+      <div>
+        <div class="status-label">Network</div>
+        <div class="status-val green" id="netStatus">Online</div>
+      </div>
+    </div>
+    <div class="status-item">
+      <span class="status-icon">🕒</span>
+      <div>
+        <div class="status-label">Time</div>
+        <div class="status-val" id="timeVal">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOS BUTTON -->
+  <div class="sos-wrap">
+    <div class="sos-ring">
+      <button class="sos-btn" onclick="startSOS()">SOS</button>
+    </div>
+    <p class="sos-sub">Hold to send emergency alert to all contacts</p>
+  </div>
+
+  <!-- LOCATION BOX -->
+  <div class="location-box" id="locationBox">
+    📍 No location captured yet
+  </div>
+
+  <!-- SHARE ACTIONS (hidden until alert fires) -->
+  <div class="share-card" id="shareCard" style="display:none">
+    <div class="share-card-title">Tap To Send Alert (one tap per contact)</div>
+    <div id="sendChecklist"></div>
+  </div>
+
+  <!-- QUICK FAKE CALL TRIGGER -->
+  <button class="btn btn-outline" id="fakeCallTrigger" onclick="triggerFakeCall()" style="margin-top:10px;display:none">📞 Trigger Fake Call</button>
+
+  <!-- CONTACTS PREVIEW -->
+  <div class="card">
+    <div class="card-header">🚨 Alert Will Be Sent To</div>
+    <div id="homeContactsList"><p class="empty-state">No contacts added yet.<br>Go to Contacts tab to add one.</p></div>
+  </div>
+
+</div>
+
+<!-- ===== CONTACTS PAGE ===== -->
+<div class="page" id="page-contacts">
+
+  <div class="card">
+    <div class="card-header">➕ Add Emergency Contact</div>
+    <div class="input-group">
+      <label class="input-label">Full Name</label>
+      <input type="text" id="newName" placeholder="e.g. Priya Sharma">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Phone Number (with country code)</label>
+      <input type="tel" id="newPhone" placeholder="+91 98765 43210">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Relation</label>
+      <select id="newRelation">
+        <option value="Family">Family</option>
+        <option value="Friend">Friend</option>
+        <option value="Colleague">Colleague</option>
+        <option value="Doctor">Doctor</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="addContact()">Save Contact</button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">👥 Saved Contacts <span id="contactCount" style="color:var(--accent)">0</span></div>
+    <div id="contactsList"><p class="empty-state">No contacts yet. Add one above.</p></div>
+  </div>
+
+</div>
+
+<!-- ===== HISTORY PAGE ===== -->
+<div class="page" id="page-history">
+  <div class="card">
+    <div class="card-header">📜 Alert History</div>
+    <div id="historyList"><p class="empty-state">No alerts sent yet.</p></div>
+  </div>
+  <button class="btn btn-outline" onclick="clearHistory()" style="margin-top:8px">Clear History</button>
+</div>
+
+<!-- ===== MEDICAL PAGE ===== -->
+<div class="page" id="page-medical">
+  <div class="card">
+    <div class="card-header">🩺 Your Medical Profile</div>
+    <div class="input-group">
+      <label class="input-label">Full Name</label>
+      <input type="text" id="medName" placeholder="Your name">
+    </div>
+    <div class="medical-row">
+      <div class="input-group">
+        <label class="input-label">Age</label>
+        <input type="text" id="medAge" placeholder="25">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Blood Group</label>
+        <select id="medBlood">
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option>
+          <option>O+</option><option>O-</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Known Allergies</label>
+      <input type="text" id="medAllergies" placeholder="e.g. Penicillin, Peanuts">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Medical Conditions</label>
+      <input type="text" id="medConditions" placeholder="e.g. Diabetes, Asthma">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Current Medications</label>
+      <input type="text" id="medMeds" placeholder="e.g. Metformin 500mg">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Additional Notes for Responders</label>
+      <textarea id="medNotes" placeholder="Any other info..." style="height:80px;resize:none"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveMedical()">Save Medical Info</button>
+  </div>
+
+  <div class="card" id="medPreviewCard" style="display:none">
+    <div class="card-header">📋 Your Medical Card (shown in SOS alert)</div>
+    <div id="medPreview" style="font-size:13px;line-height:1.8;color:var(--muted)"></div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS PAGE ===== -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <div class="card-header">⚙ Alert Settings</div>
+
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Countdown Duration</div>
+        <div class="settings-desc">Seconds before alert fires</div>
+      </div>
+      <select class="countdown-select" id="countdownSetting">
+        <option value="5">5 sec</option>
+        <option value="10" selected>10 sec</option>
+        <option value="15">15 sec</option>
+        <option value="30">30 sec</option>
+      </select>
+    </div>
+
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Include Medical Info in Alert</div>
+        <div class="settings-desc">Share blood group & conditions</div>
+      </div>
+      <button class="toggle on" id="toggleMed" onclick="toggleBtn(this)"></button>
+    </div>
+
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Vibration on SOS</div>
+        <div class="settings-desc">Vibrate phone when SOS starts</div>
+      </div>
+      <button class="toggle on" id="toggleVibrate" onclick="toggleBtn(this)"></button>
+    </div>
+
+    <div class="settings-item">
+      <div>
+        <div class="settings-label">Fake Call Feature</div>
+        <div class="settings-desc">Simulate incoming call to exit situation</div>
+      </div>
+      <button class="toggle" id="toggleFakeCall" onclick="toggleBtn(this)"></button>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <div class="card-header">ℹ About</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7">
+      <strong style="color:var(--text)">Rakshak SOS v2.0</strong><br>
+      Your Emergency Safety Companion.<br>
+      All data is stored locally on your device. Nothing is uploaded to any server.
+    </p>
+  </div>
+
+  <button class="btn btn-outline" onclick="clearAllData()" style="margin-top:8px;border-color:rgba(230,57,70,0.4);color:var(--red)">Clear All Data</button>
+</div>
+
+<!-- ===== COUNTDOWN MODAL ===== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">🚨 Emergency Alert</div>
+    <div class="modal-sub">Sending alert in</div>
+
+    <div class="countdown-ring">
+      <svg class="countdown-svg" width="160" height="160">
+        <circle class="countdown-circle-bg" cx="80" cy="80" r="65"/>
+        <circle class="countdown-circle" id="progressCircle" cx="80" cy="80" r="65"/>
+      </svg>
+      <div class="countdown-number" id="countNum">10</div>
+    </div>
+
+    <div class="modal-contacts-preview" id="modalContactsPreview">
+      Alerting: <strong>Loading contacts...</strong>
+    </div>
+
+    <button class="btn btn-success" style="max-width:240px;margin:auto" onclick="cancelSOS()">✕ Cancel Alert</button>
+  </div>
+</div>
+
+<!-- ===== FAKE CALL SCREEN ===== -->
+<div class="fakecall-overlay" id="fakeCallOverlay">
+  <div class="fakecall-top">
+    <div class="fakecall-label" id="fcStatusLabel">Incoming call</div>
+    <div class="fakecall-name" id="fcCallerName">Mom</div>
+    <div class="fakecall-avatar" id="fcAvatar">M</div>
+    <div class="fakecall-sub" id="fcSub">mobile</div>
+  </div>
+
+  <div class="fakecall-actions" id="fcRingingActions">
+    <div class="fc-btn-wrap">
+      <button class="fc-btn fc-decline" onclick="endFakeCall()">✕</button>
+      <div class="fc-btn-label">Decline</div>
+    </div>
+    <div class="fc-btn-wrap">
+      <button class="fc-btn fc-accept" onclick="answerFakeCall()">📞</button>
+      <div class="fc-btn-label">Accept</div>
+    </div>
+  </div>
+
+  <div class="fakecall-active-bar" id="fcActiveBar">
+    <button class="fc-btn fc-decline" onclick="endFakeCall()" style="margin:auto">✕</button>
+    <div class="fc-btn-label" style="margin-top:8px">End Call</div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────
+let contacts = JSON.parse(localStorage.getItem('rsos_contacts') || '[]');
+let history  = JSON.parse(localStorage.getItem('rsos_history')  || '[]');
+let medical  = JSON.parse(localStorage.getItem('rsos_medical')  || '{}');
+
+let sosTimer, sosSeconds, totalSeconds;
+const CIRCUMFERENCE = 2 * Math.PI * 65; // 408.4
+
+// ─── PWA: SERVICE WORKER ─────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
+  });
+}
+
+// ─── FAKE CALL FEATURE ───────────────────────────────
+let fcRingInterval, fcCallTimer, fcAudioCtx;
+
+function triggerFakeCall() {
+  const caller = contacts.length ? contacts[Math.floor(Math.random()*contacts.length)] : { name: 'Mom' };
+  document.getElementById('fcCallerName').textContent = caller.name;
+  document.getElementById('fcAvatar').textContent = caller.name.charAt(0).toUpperCase();
+  document.getElementById('fcStatusLabel').textContent = 'Incoming call';
+  document.getElementById('fcSub').textContent = 'mobile';
+  document.getElementById('fcRingingActions').style.display = 'flex';
+  document.getElementById('fcActiveBar').classList.remove('show');
+  document.getElementById('fakeCallOverlay').classList.add('show');
+
+  if (navigator.vibrate) {
+    fcRingInterval = setInterval(() => navigator.vibrate([500,300,500,300]), 1600);
+    navigator.vibrate([500,300,500,300]);
+  }
+  playRingtone();
+}
+
+function playRingtone() {
+  try {
+    fcAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const beep = (time, freq) => {
+      const o = fcAudioCtx.createOscillator();
+      const g = fcAudioCtx.createGain();
+      o.frequency.value = freq;
+      o.type = 'sine';
+      g.gain.setValueAtTime(0.15, time);
+      o.connect(g); g.connect(fcAudioCtx.destination);
+      o.start(time); o.stop(time + 0.4);
+    };
+    const loop = () => {
+      if (!document.getElementById('fakeCallOverlay').classList.contains('show')) return;
+      const now = fcAudioCtx.currentTime;
+      beep(now, 950); beep(now+0.5, 950);
+      fcCallTimer = setTimeout(loop, 2000);
+    };
+    loop();
+  } catch(e) { console.log('Audio unavailable', e); }
+}
+
+function stopRingtone() {
+  clearInterval(fcRingInterval);
+  clearTimeout(fcCallTimer);
+  if (fcAudioCtx) { fcAudioCtx.close(); fcAudioCtx = null; }
+}
+
+function answerFakeCall() {
+  stopRingtone();
+  document.getElementById('fcStatusLabel').textContent = 'Calling…';
+  document.getElementById('fcRingingActions').style.display = 'none';
+  document.getElementById('fcActiveBar').classList.add('show');
+  let secs = 0;
+  fcCallTimer = setInterval(() => {
+    secs++;
+    const m = Math.floor(secs/60), s = String(secs%60).padStart(2,'0');
+    document.getElementById('fcStatusLabel').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function endFakeCall() {
+  stopRingtone();
+  clearInterval(fcCallTimer);
+  document.getElementById('fakeCallOverlay').classList.remove('show');
+}
+
+function updateFakeCallVisibility() {
+  const on = document.getElementById('toggleFakeCall').classList.contains('on');
+  document.getElementById('fakeCallTrigger').style.display = on ? 'block' : 'none';
+  localStorage.setItem('rsos_fakecall_on', on ? '1' : '0');
+}
+
+// ─── TABS ────────────────────────────────────────────
+function showPage(id, tabEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  tabEl.classList.add('active');
+
+  if (id === 'contacts') renderContacts();
+  if (id === 'history')  renderHistory();
+  if (id === 'medical')  loadMedicalForm();
+}
+
+// ─── STATUS BAR ──────────────────────────────────────
+setInterval(() => {
+  document.getElementById('timeVal').textContent = new Date().toLocaleTimeString();
+}, 1000);
+
+if ('getBattery' in navigator) {
+  navigator.getBattery().then(b => {
+    const pct = Math.round(b.level * 100);
+    const el = document.getElementById('batteryVal');
+    el.textContent = pct + '%';
+    el.className = 'status-val ' + (pct < 20 ? 'red' : 'green');
+    b.addEventListener('levelchange', () => {
+      const p = Math.round(b.level * 100);
+      el.textContent = p + '%';
+      el.className = 'status-val ' + (p < 20 ? 'red' : 'green');
+    });
+  });
+}
+
+window.addEventListener('online',  () => { document.getElementById('netStatus').textContent='Online';  document.getElementById('netStatus').className='status-val green'; document.getElementById('networkBadge').textContent='● Online'; });
+window.addEventListener('offline', () => { document.getElementById('netStatus').textContent='Offline'; document.getElementById('netStatus').className='status-val red';   document.getElementById('networkBadge').textContent='● Offline'; });
+
+// ─── CONTACTS ────────────────────────────────────────
+function addContact() {
+  const name  = document.getElementById('newName').value.trim();
+  const phone = document.getElementById('newPhone').value.trim();
+  const rel   = document.getElementById('newRelation').value;
+
+  if (!name || !phone) { alert('Please enter name and phone number.'); return; }
+
+  contacts.push({ id: Date.now(), name, phone, rel });
+  saveContacts();
+  document.getElementById('newName').value  = '';
+  document.getElementById('newPhone').value = '';
+  renderContacts();
+  renderHomeContacts();
+}
+
+function deleteContact(id) {
+  contacts = contacts.filter(c => c.id !== id);
+  saveContacts();
+  renderContacts();
+  renderHomeContacts();
+}
+
+function saveContacts() {
+  localStorage.setItem('rsos_contacts', JSON.stringify(contacts));
+}
+
+function avatarLetter(name) {
+  return name.charAt(0).toUpperCase();
+}
+
+function renderContacts() {
+  const list = document.getElementById('contactsList');
+  document.getElementById('contactCount').textContent = contacts.length;
+  if (!contacts.length) {
+    list.innerHTML = '<p class="empty-state">No contacts yet. Add one above.</p>';
+    return;
+  }
+  list.innerHTML = contacts.map(c => `
+    <div class="contact-item">
+      <div class="contact-avatar">${avatarLetter(c.name)}</div>
+      <div>
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-phone">${c.rel} · ${c.phone}</div>
+      </div>
+      <div class="contact-actions">
+        <a href="tel:${c.phone}" class="icon-btn" title="Call">📞</a>
+        <button class="icon-btn danger" onclick="deleteContact(${c.id})" title="Delete">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHomeContacts() {
+  const el = document.getElementById('homeContactsList');
+  if (!contacts.length) {
+    el.innerHTML = '<p class="empty-state">No contacts added yet.<br>Go to Contacts tab to add one.</p>';
+    return;
+  }
+  el.innerHTML = contacts.map(c => `
+    <div class="contact-item">
+      <div class="contact-avatar">${avatarLetter(c.name)}</div>
+      <div>
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-phone">${c.rel} · ${c.phone}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── MEDICAL ─────────────────────────────────────────
+function saveMedical() {
+  medical = {
+    name:       document.getElementById('medName').value.trim(),
+    age:        document.getElementById('medAge').value.trim(),
+    blood:      document.getElementById('medBlood').value,
+    allergies:  document.getElementById('medAllergies').value.trim(),
+    conditions: document.getElementById('medConditions').value.trim(),
+    meds:       document.getElementById('medMeds').value.trim(),
+    notes:      document.getElementById('medNotes').value.trim(),
+  };
+  localStorage.setItem('rsos_medical', JSON.stringify(medical));
+  renderMedPreview();
+  alert('Medical info saved ✓');
+}
+
+function loadMedicalForm() {
+  if (medical.name)       document.getElementById('medName').value       = medical.name;
+  if (medical.age)        document.getElementById('medAge').value        = medical.age;
+  if (medical.blood)      document.getElementById('medBlood').value      = medical.blood;
+  if (medical.allergies)  document.getElementById('medAllergies').value  = medical.allergies;
+  if (medical.conditions) document.getElementById('medConditions').value = medical.conditions;
+  if (medical.meds)       document.getElementById('medMeds').value       = medical.meds;
+  if (medical.notes)      document.getElementById('medNotes').value      = medical.notes;
+  renderMedPreview();
+}
+
+function renderMedPreview() {
+  if (!medical.name) return;
+  document.getElementById('medPreviewCard').style.display = 'block';
+  document.getElementById('medPreview').innerHTML = `
+    <b>Name:</b> ${medical.name || '—'}<br>
+    <b>Age:</b> ${medical.age || '—'}<br>
+    <b>Blood Group:</b> ${medical.blood || '—'}<br>
+    <b>Allergies:</b> ${medical.allergies || 'None'}<br>
+    <b>Conditions:</b> ${medical.conditions || 'None'}<br>
+    <b>Medications:</b> ${medical.meds || 'None'}<br>
+    <b>Notes:</b> ${medical.notes || '—'}
+  `;
+}
+
+// ─── HISTORY ─────────────────────────────────────────
+function addHistory(entry) {
+  history.unshift(entry);
+  if (history.length > 50) history.pop();
+  localStorage.setItem('rsos_history', JSON.stringify(history));
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!history.length) {
+    el.innerHTML = '<p class="empty-state">No alerts sent yet.</p>';
+    return;
+  }
+  el.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div class="history-dot ${h.status==='cancelled'?'cancelled':''}"></div>
+      <div>
+        <div class="history-title">${h.status === 'sent' ? '🚨 Alert Sent' : '✕ Alert Cancelled'}</div>
+        <div class="history-meta">${h.time}${h.location ? ' · ' + h.location : ''}</div>
+      </div>
+      <span class="history-badge ${h.status==='sent'?'badge-sent':'badge-cancelled'}">${h.status.toUpperCase()}</span>
+    </div>
+  `).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Clear all alert history?')) return;
+  history = [];
+  localStorage.setItem('rsos_history', '[]');
+  renderHistory();
+}
+
+// ─── SOS LOGIC ───────────────────────────────────────
+function buildAlertMessage(lat, lng) {
+  const mapLink = `https://maps.google.com/?q=${lat},${lng}`;
+  const name = medical.name || 'Unknown User';
+  const includeMed = document.getElementById('toggleMed').classList.contains('on');
+
+  let msg = `🚨 EMERGENCY ALERT 🚨\n\n`;
+  msg += `Name: ${name}\n`;
+  msg += `I need immediate help!\n\n`;
+  msg += `📍 My Location: ${mapLink}\n`;
+
+  if (includeMed && medical.blood) {
+    msg += `\n🩺 Medical Info:\n`;
+    msg += `Blood: ${medical.blood}\n`;
+    if (medical.conditions) msg += `Conditions: ${medical.conditions}\n`;
+    if (medical.allergies)  msg += `Allergies: ${medical.allergies}\n`;
+    if (medical.meds)       msg += `Meds: ${medical.meds}\n`;
+  }
+
+  msg += `\n⏰ Sent at: ${new Date().toLocaleString()}`;
+  return { msg, mapLink };
+}
+
+function startSOS() {
+  if (document.getElementById('toggleVibrate').classList.contains('on') && navigator.vibrate) {
+    navigator.vibrate([200, 100, 200]);
+  }
+
+  totalSeconds = parseInt(document.getElementById('countdownSetting').value);
+  sosSeconds   = totalSeconds;
+
+  // update modal contacts preview
+  const names = contacts.length ? contacts.map(c => c.name).join(', ') : 'No contacts saved!';
+  document.getElementById('modalContactsPreview').innerHTML = `Alerting: <strong>${names}</strong>`;
+
+  document.getElementById('countNum').textContent = sosSeconds;
+  updateProgressRing(sosSeconds);
+  document.getElementById('modal').classList.add('show');
+
+  sosTimer = setInterval(() => {
+    sosSeconds--;
+    document.getElementById('countNum').textContent = sosSeconds;
+    updateProgressRing(sosSeconds);
+
+    if (sosSeconds <= 0) {
+      clearInterval(sosTimer);
+      document.getElementById('modal').classList.remove('show');
+      fireAlert();
+    }
+  }, 1000);
+}
+
+function updateProgressRing(remaining) {
+  const fraction = remaining / totalSeconds;
+  const offset = CIRCUMFERENCE * (1 - fraction);
+  document.getElementById('progressCircle').style.strokeDashoffset = offset;
+}
+
+function cancelSOS() {
+  clearInterval(sosTimer);
+  document.getElementById('modal').classList.remove('show');
+  addHistory({ status: 'cancelled', time: new Date().toLocaleString() });
+}
+
+function fireAlert() {
+  document.getElementById('gpsStatus').textContent = 'Locating…';
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      document.getElementById('gpsStatus').textContent = 'Located ✓';
+      document.getElementById('gpsStatus').className   = 'status-val green';
+
+      const { msg, mapLink } = buildAlertMessage(lat, lng);
+      const encoded = encodeURIComponent(msg);
+
+      // Show location box
+      const locBox = document.getElementById('locationBox');
+      locBox.className = 'location-box active';
+      locBox.innerHTML = `
+        🚨 <strong>Alert Ready to Send</strong><br>
+        📍 <a href="${mapLink}" target="_blank">Open Your Location</a><br>
+        <small style="color:var(--muted)">Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}</small>
+      `;
+
+      // Build tap-to-send checklist (avoids popup blockers — each link needs one real tap)
+      const shareCard = document.getElementById('shareCard');
+      shareCard.style.display = 'block';
+      const listEl = document.getElementById('sendChecklist');
+
+      if (contacts.length) {
+        listEl.innerHTML = contacts.map(c => {
+          const p = c.phone.replace(/\D/g, '');
+          return `
+            <div class="send-item">
+              <div class="contact-avatar" style="width:32px;height:32px;font-size:13px">${avatarLetter(c.name)}</div>
+              <div class="contact-name">${c.name}</div>
+              <div class="send-links">
+                <a class="send-wa" href="https://wa.me/${p}?text=${encoded}" target="_blank">WhatsApp</a>
+                <a class="send-sms" href="sms:${c.phone}?body=${encoded}">SMS</a>
+              </div>
+            </div>`;
+        }).join('');
+      } else {
+        listEl.innerHTML = `
+          <div class="send-item">
+            <div class="contact-name">No saved contacts</div>
+            <div class="send-links">
+              <a class="send-wa" href="https://wa.me/?text=${encoded}" target="_blank">WhatsApp</a>
+              <a class="send-sms" href="sms:?body=${encoded}">SMS</a>
+            </div>
+          </div>`;
+      }
+
+      // Log history
+      addHistory({
+        status: 'sent',
+        time: new Date().toLocaleString(),
+        location: `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+      });
+
+      if (navigator.vibrate) navigator.vibrate([500, 200, 500, 200, 500]);
+    },
+    err => {
+      document.getElementById('gpsStatus').textContent = 'Error';
+      document.getElementById('gpsStatus').className   = 'status-val red';
+      const locBox = document.getElementById('locationBox');
+      locBox.className = 'location-box active';
+      locBox.innerHTML = `⚠ Location Error: ${err.message}<br><small>Alert message prepared without GPS.</small>`;
+      addHistory({ status: 'sent', time: new Date().toLocaleString(), location: 'GPS unavailable' });
+    },
+    { timeout: 10000 }
+  );
+}
+
+// ─── SETTINGS ────────────────────────────────────────
+function toggleBtn(el) {
+  el.classList.toggle('on');
+  if (el.id === 'toggleFakeCall') updateFakeCallVisibility();
+}
+
+function clearAllData() {
+  if (!confirm('Clear ALL data (contacts, history, medical info)?')) return;
+  localStorage.clear();
+  contacts = []; history = []; medical = {};
+  renderContacts(); renderHomeContacts(); renderHistory();
+  alert('All data cleared.');
+}
+
+// ─── INIT ─────────────────────────────────────────────
+renderHomeContacts();
+loadMedicalForm();
+if (localStorage.getItem('rsos_fakecall_on') === '1') {
+  document.getElementById('toggleFakeCall').classList.add('on');
+}
+updateFakeCallVisibility();
+</script>
+</body>
+</html>
